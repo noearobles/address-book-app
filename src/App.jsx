@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import axios from "axios";
+import "./App.css";
+import Display from "./components/Display";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    (async function fetchUsers() {
+      const data = [];
+      const response = await axios("https://randomuser.me/api?results=25");
+
+      response.data.results.forEach((user) => {
+        data.push({
+          name: user.name.first + " " + user.name.last,
+          thumbnail: user.picture.large,
+          email: user.email,
+          username: user.login.username,
+          registered: user.registered.date,
+        });
+      });
+      setUsers(data);
+    })();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ul style={{ listStyle: "none" }}>
+      {users.map((user) => (
+        <Display key={user.uuid} user={user} />
+      ))}
+    </ul>
+  );
 }
 
-export default App
+export default App;
